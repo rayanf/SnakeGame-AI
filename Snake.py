@@ -39,11 +39,50 @@ class Player(pygame.sprite.Sprite):
                 if self.Direction == self.move[i]:  
                     self.rect.x += self.vx * [-1, 1][i]  
 
-            for i in range(2):  
-                if self.Direction == self.move[2:4][i]:  
+                elif self.Direction == self.move[2:4][i]:  
                     self.rect.y += self.vy * [-1, 1][i]
 
+    def tail_run(self):
+        temp_direction1 = None
+        temp_direction2 = None
+        temp_pos1 = None
+        temp_pos2 = None
+        firstCheck = 1
+        for tail in self.tails:
+            if firstCheck == 1:
+                temp_pos1 = tail.rect.center
+                
+                for i in range(2):
+                    if self.Direction == self.move[i]:  
+                        tail.rect.center = (self.rect.center[0] - 20 * [-1, 1][i],self.rect.center[1])
 
+                    elif self.Direction == self.move[2:4][i]:  
+                        tail.rect.center = (self.rect.center[0],self.rect.center[1] - 20 * [-1, 1][i])
+
+
+                temp_direction1 = tail.Direction
+                tail.Direction = self.Direction
+                firstCheck = 0
+            else:
+                temp_pos2 = tail.rect.center
+                tail.rect.center = temp_pos1
+                temp_pos1 = temp_pos2
+                temp_direction2 = tail.Direction
+                tail.Direction = temp_direction1
+                temp_direction1 = temp_direction2
+
+    def create_tail(self, tail_group):
+        for i in range(2):
+                if self.Direction == self.move[i]:  
+                    pos = (self.rect.center[0] - 20 * [-1, 1][i],self.rect.center[1])
+
+                elif self.Direction == self.move[2:4][i]:  
+                    pos = (self.rect.center[0],self.rect.center[1] - 20 * [-1, 1][i])
+
+        tail = Tail(pos)
+        tail.Direction = self.Direction
+        tail_group.add(tail)
+        self.tails.append(tail)
 
 class Food(pygame.sprite.Sprite):  
     def __init__(self, pos):  
@@ -75,21 +114,12 @@ class Tail(pygame.sprite.Sprite):
         self.move = [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN]  
         self.vx = 20
         self.vy = 20
-
-    def run(self):
-        if self.Direction != None:
-            for i in range(2):  
-                if self.Direction == self.move[i]:  
-                    self.rect.x += self.vx * [-1, 1][i]  
-
-            for i in range(2):  
-                if self.Direction == self.move[2:4][i]:  
-                    self.rect.y += self.vy * [-1, 1][i] 
-
+    
 
 
 def wall_trigger(player):
     if player.rect.center[0] not in range(0,600) or player.rect.center[1] not in range(0,600):
+        player.health -= 1
         return True
     else:
         return False
@@ -100,23 +130,34 @@ def Health_trigger(player):
     else: 
         return False
 
-# def body_trigger(player):
-#     for tail in 
+def body_trigger(player):
+    for tail in player.tails:
 
-
+        if player.rect.center == tail.rect.center:
+            player.health -= 1
+            return True
+        
+    return False
 
 def Display_score(player,score,screen):
-    score_font = pygame.font.SysFont("comicsansms", 35) 
-    value = score_font.render("Your Score: " + str(score), True, (255, 255, 102))
-    health = score_font.render("Your Health: " + str(player.health), True, (255, 255, 102))
+    score_font = pygame.font.SysFont("comicsansms", 25) 
+    value = score_font.render("Score: " + str(score), True, (255, 255, 102))
+    health = score_font.render("Health: " + str(player.health), True, (255, 255, 102))
 
     screen.blit(value, [0, 0])
     screen.blit(health, [250, 0])
  
+def eat(food_group ,tail_group ,player):
+    generate_food(food_group) 
+    player.length += 1
+    player.create_tail(tail_group)
+
+    
+
 def Snake_game():  
     pygame.init()  
     clock = pygame.time.Clock()  
-    fps = 20
+    fps = 15
     bg = (50, 153, 213)
   
     size =[600, 600]  
@@ -134,10 +175,8 @@ def Snake_game():
     
     GameOver = False
     while not GameOver:  
-        if wall_trigger(player):
-            player.health -= 1
-            
-
+        wall_trigger(player)
+        body_trigger(player)    
         GameOver = Health_trigger(player)
 
         screen.fill(bg)  
@@ -148,30 +187,12 @@ def Snake_game():
         pressed = pygame.key.get_pressed()
         player.get_direction(pressed)
         player.run()
-
-        temp_direction1 = None
-        temp_direction2 = None
-        firstCheck = 1
-        for tail in player.tails:
-            if firstCheck == 1:
-                tail.run()
-                temp_direction1 = tail.Direction
-                tail.Direction = player.Direction
-                firstCheck = 0
-            else:
-                tail.run() 
-                temp_direction2 = tail.Direction
-                tail.Direction = temp_direction1
-                temp_direction1 = temp_direction2
+        player.tail_run()
 
         hit = pygame.sprite.spritecollide(player, food_group, True)  
-        if hit: 
-            generate_food(food_group) 
-            player.length += 1
-            tail = Tail(player.rect.center)
-            tail.Direction = player.Direction
-            tail_group.add(tail)
-            player.tails.append(tail)
+        if hit:
+            eat(food_group,tail_group, player)
+            
 
         Display_score(player,player.length,screen)
         player_group.draw(screen)  
