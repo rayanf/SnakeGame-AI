@@ -1,93 +1,73 @@
-# import pygame  
-# pygame.init()  
-# white = (255, 255, 255)  
-
-# height = 600  
-# width = 600  
-
-# display_surface = pygame.display.set_mode((height, width))  
-  
-# pygame.display.set_caption('Image')  
-  
-# image = pygame.image.load(r'E:/Photo/photo_2019-07-10_15-51-55.jpg')  
-  
-# is_blue = True  
-# x = 30  
-# y = 30  
-
-# while True:  
-#     display_surface.fill(white)  
-#     display_surface.blit(image, (0, 0))
-
-
-#     for event in pygame.event.get():  
-#         if event.type == pygame.QUIT:  
-#             pygame.quit()  
-#             quit() 
-#         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:  
-#             is_blue = not is_blue 
-
-
-    
-#     pressed = pygame.key.get_pressed()  
-#     if pressed[pygame.K_UP]: y -= 1
-#     if pressed[pygame.K_DOWN]: y += 1  
-#     if pressed[pygame.K_LEFT]: x -= 1  
-#     if pressed[pygame.K_RIGHT]:  x += 1      
-
-    
-#     if is_blue:  
-#         color = (0, 128, 255)  
-#     else:   
-#         color = (255, 100, 0)  
-
-#     pygame.draw.rect(display_surface, color , pygame.Rect(x, y, 60, 60))
-
-
-#     # if event.type in (pygame.KEYDOWN, pygame.KEYUP):  
-#     #     key_name = pygame.key.name(event.key)  
-#     #     key_name = key_name.upper()  
-
-#     #     if event.type == pygame.KEYDOWN:  
-#     #         print(u'"{}" key pressed'.format(key_name))  
-
-#     #     elif event.type == pygame.KEYUP:  
-#     #         print(u'"{}" key released'.format(key_name))  
-        
-#     pygame.display.update()   
-
-
-
-
 import pygame  
 import sys  
-#Sprite class   
+import random
+
 class Sprite(pygame.sprite.Sprite):  
     def __init__(self, pos):  
         pygame.sprite.Sprite.__init__(self)  
-        self.image = pygame.Surface([20, 20])  
-        self.image.fill((255, 100, 255))  
+        self.image = pygame.Surface([10, 10])  
         self.rect = self.image.get_rect()  
         self.rect.center = pos  
         self.Direction = None
+        self.headPos = pos
+        self.tails = []
+        self.length = 0
+        
+    def get_direction(self,pressed):
+        for i in range(4):
+            if pressed[self.move[i]]:
+                key = self.move[i]
+                if key == pygame.K_LEFT and self.Direction != pygame.K_RIGHT:
+                    self.Direction = key
+                elif key == pygame.K_UP and self.Direction != pygame.K_DOWN:
+                    self.Direction = key
+                elif key == pygame.K_DOWN and self.Direction != pygame.K_UP:
+                    self.Direction = key
+                elif key == pygame.K_RIGHT and self.Direction != pygame.K_LEFT:
+                    self.Direction = key
+
+    def run(self):
+        if self.Direction != None:
+            for i in range(2):  
+                if self.Direction == self.move[i]:  
+                    self.rect.x += self.vx * [-1, 1][i]  
+
+            for i in range(2):  
+                if self.Direction == self.move[2:4][i]:  
+                    self.rect.y += self.vy * [-1, 1][i]
+
+
+
+def generate_food(food_group):
+    x = random.randint(0,600)
+    y = random.randint(0,600)
+
+    food = Sprite([x,y])
+    food.image.fill((110, 215, 45))
+ 
+    food_group.add(food)
+
+    return [x,y]
 
 def main():  
     pygame.init()  
     clock = pygame.time.Clock()  
-    fps = 50
+    fps = 20
     bg = [100, 100, 100]  
     size =[600, 600]  
     screen = pygame.display.set_mode(size)  
     player = Sprite([30, 30])  
 
     player.move = [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN]  
-    player.vx = 5 
-    player.vy = 5 
-  
-    wall = Sprite([100, 60])  
-  
-    wall_group = pygame.sprite.Group()  
-    wall_group.add(wall)  
+    player.vx = 10
+    player.vy = 10
+    player.image.fill((255, 100, 255))  
+
+    food = Sprite([100, 60])  
+    food.image.fill((110, 215, 45))  
+
+    food_group = pygame.sprite.Group()  
+    food_group.add(food)  
   
     player_group = pygame.sprite.Group()  
     player_group.add(player)  
@@ -98,30 +78,21 @@ def main():
                 return False
 
         pressed = pygame.key.get_pressed()
-        for i in range(4):
-            if pressed[player.move[i]]:
-                key = player.move[i]
-                player.Direction = key
-                print('check')
 
-        if player.Direction != None:
-            for i in range(2):  
-                if player.Direction == player.move[i]:  
-                    player.rect.x += player.vx * [-1, 1][i]  
-    
-            for i in range(2):  
-                if player.Direction == player.move[2:4][i]:  
-                    player.rect.y += player.vy * [-1, 1][i]  
-
+        player.get_direction(pressed)
+        player.run()
+          
         screen.fill(bg)  
       
-        hit = pygame.sprite.spritecollide(player, wall_group, True)  
+        hit = pygame.sprite.spritecollide(player, food_group, True)  
 
-        if hit:  
-            player.image.fill((250, 250, 250))  
+        if hit: 
+            generate_food(food_group) 
+            
+
 
         player_group.draw(screen)  
-        wall_group.draw(screen)  
+        food_group.draw(screen)  
         pygame.display.update()  
         clock.tick(fps)  
     pygame.quit()  
