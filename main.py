@@ -96,16 +96,22 @@ def main():
         for event in pygame.event.get():  
             if event.type == pygame.QUIT:  
                 return False
-    
-        key = pygame.key.get_pressed() 
 
-        for i in range(2):  
-            if key[player.move[i]]:  
-                player.rect.x += player.vx * [-1, 1][i]  
-  
-        for i in range(2):  
-            if key[player.move[2:4][i]]:  
-                player.rect.y += player.vy * [-1, 1][i]  
+        pressed = pygame.key.get_pressed()
+        for i in range(4):
+            if pressed[player.move[i]]:
+                key = player.move[i]
+                player.Direction = key
+                print('check')
+
+        if player.Direction != None:
+            for i in range(2):  
+                if player.Direction == player.move[i]:  
+                    player.rect.x += player.vx * [-1, 1][i]  
+    
+            for i in range(2):  
+                if player.Direction == player.move[2:4][i]:  
+                    player.rect.y += player.vy * [-1, 1][i]  
 
         screen.fill(bg)  
       
