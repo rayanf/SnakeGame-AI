@@ -69,6 +69,7 @@ class Sprite(pygame.sprite.Sprite):
         self.image.fill((255, 100, 255))  
         self.rect = self.image.get_rect()  
         self.rect.center = pos  
+        self.Direction = None
 
 def main():  
     pygame.init()  
@@ -78,7 +79,7 @@ def main():
     size =[600, 600]  
     screen = pygame.display.set_mode(size)  
     player = Sprite([30, 30])  
-    # Define keys for player movement  
+
     player.move = [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN]  
     player.vx = 5 
     player.vy = 5 
@@ -90,12 +91,14 @@ def main():
   
     player_group = pygame.sprite.Group()  
     player_group.add(player)  
-  
+
     while True:  
         for event in pygame.event.get():  
             if event.type == pygame.QUIT:  
-                return False  
-        key = pygame.key.get_pressed()  
+                return False
+    
+        key = pygame.key.get_pressed() 
+
         for i in range(2):  
             if key[player.move[i]]:  
                 player.rect.x += player.vx * [-1, 1][i]  
@@ -103,17 +106,20 @@ def main():
         for i in range(2):  
             if key[player.move[2:4][i]]:  
                 player.rect.y += player.vy * [-1, 1][i]  
+
         screen.fill(bg)  
       
         hit = pygame.sprite.spritecollide(player, wall_group, True)  
+
         if hit:  
             player.image.fill((250, 250, 250))  
 
-        # player_group.draw(screen)  
+        player_group.draw(screen)  
         wall_group.draw(screen)  
         pygame.display.update()  
         clock.tick(fps)  
     pygame.quit()  
     sys.exit  
+
 if __name__ == '__main__':  
     main()
