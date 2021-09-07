@@ -18,7 +18,7 @@ class Player(pygame.sprite.Sprite):
         self.headPos = pos
         self.length = 0
         self.tails = []
-        self.health = 1
+        self.health = 3
     
     def get_direction(self,pressed):
         for i in range(4):
@@ -120,6 +120,7 @@ class Tail(pygame.sprite.Sprite):
 def wall_trigger(player):
     if player.rect.center[0] not in range(0,600) or player.rect.center[1] not in range(0,600):
         player.health -= 1
+        reset(player)
         return True
     else:
         return False
@@ -135,6 +136,7 @@ def body_trigger(player):
 
         if player.rect.center == tail.rect.center:
             player.health -= 1
+            reset(player)
             return True
         
     return False
@@ -152,12 +154,16 @@ def eat(food_group ,tail_group ,player):
     player.length += 1
     player.create_tail(tail_group)
 
-    
+def reset(player):
+    player.rect.center = (30,30)
+    player.Direction = None
+    for tail in player.tails:
+        tail.rect.center = (10,30)
 
 def Snake_game():  
     pygame.init()  
     clock = pygame.time.Clock()  
-    fps = 15
+    fps = 13
     bg = (50, 153, 213)
   
     size =[600, 600]  
@@ -206,4 +212,3 @@ def Snake_game():
 
 if __name__ == '__main__':  
     score = Snake_game()
-    print(score)
