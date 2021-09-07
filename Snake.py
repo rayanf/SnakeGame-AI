@@ -211,4 +211,5 @@ def Snake_game():
     return player.length
 
 if __name__ == '__main__':  
-    score = Snake_game()
+    while True:
+        score = Snake_game()
