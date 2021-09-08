@@ -106,12 +106,15 @@ class snake_game:
         self.w = 600
         self.h = 600
         self.snake_size = 20
+        self.fps = 15
 
         self.screen = pygame.display.set_mode([self.w,self.h])  
         self.clock = pygame.time.Clock()  
         self.framIter = 0
 
         self.snake = Player([30,30])
+        self.snakeGroup = pygame.sprite.Group()
+        self.snakeGroup.add(self.snake) 
         self.foods = pygame.sprite.Group()
 
 
@@ -164,6 +167,7 @@ class snake_game:
         self.eat()          #check eat foods
 
         self.update_screen()
+        self.clock.tick(self.fps)  
 
     def update_screen(self):
         score_font = pygame.font.SysFont("comicsansms", 25) 
@@ -171,7 +175,7 @@ class snake_game:
         self.screen.blit(value, [0, 0])
 
         self.screen.fill((50, 153, 213))
-        self.snake.draw(self.screen)  
+        self.snakeGroup.draw(self.screen)  
         self.foods.draw(self.screen) 
         self.snake.tailsObject.draw(self.screen) 
         pygame.display.update()  
@@ -183,3 +187,5 @@ class snake_game:
 if __name__ == '__main__':  
     game = snake_game()
     game.reset()
+    while True:
+        game.one_step(pygame.K_UP)
