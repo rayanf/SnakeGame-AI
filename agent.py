@@ -41,22 +41,22 @@ class Agent:
          
         up_danger, right_danger, left_danger, down_danger = game.snake.get_danger()
 
-        if up_danger < 40 and dir_u :
+        if up_danger <= 20:
             up_danger = 1
         else :
             up_danger = 0
 
-        if down_danger < 40 and dir_d :
+        if down_danger <= 20 :
             down_danger = 1
         else :
             down_danger = 0
         
-        if right_danger < 40 and dir_r :
+        if right_danger <= 20:
             right_danger = 1
         else :
             right_danger = 0
             
-        if left_danger < 40 and dir_l :
+        if left_danger <= 20 :
             left_danger = 1
         else :
             left_danger = 0
@@ -102,12 +102,12 @@ class Agent:
         final_move = ['forward' ,'left' ,'right']
         if random.randint(0, 200) < self.epsilon:
             move = random.randint(0, 2)
-            return self.relativ_to_absolute(final_move[move],game.snake.direction)
+            return self.relativ_to_absolute(final_move[move],game.snake.direction),final_move[move]
         else:
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
-            return  self.relativ_to_absolute(final_move[move],game.snake.direction)
+            return  self.relativ_to_absolute(final_move[move],game.snake.direction),final_move[move]
 
 
     def relativ_to_absolute(self,relativeDirect,curentDirect):
@@ -132,12 +132,15 @@ def train():
     while True:
         state_old = agent.get_state(game)
 
-        final_move = agent.get_action(state_old,game)
+        final_move, train_move = agent.get_action(state_old,game)
 
         reward, done, score = game.one_step(final_move)
         state_new = agent.get_state(game)
-    
-        agent.train_short_memory(state_old, final_move, reward, state_new, done)
+
+        train_moves = [0,0,0]
+        move_options = ['forward' ,'left' ,'right']
+        train_moves[move_options.index(train_move)] = 1
+        agent.train_short_memory(state_old, train_moves, reward, state_new, done)
 
         agent.remember(state_old, final_move, reward, state_new, done)
 

@@ -177,15 +177,15 @@ class Player(pygame.sprite.Sprite):
         for tail in self.tails:
             if tail.rect.center[1] == self.rect.center[1]:
                 if tail.rect.center[0] > self.rect.center[0]:
-                    left_danger.append(tail.rect.center[0] - self.rect.center[0])
+                    right_danger.append(tail.rect.center[0] - self.rect.center[0])
                 else:
-                    right_danger.append(self.rect.center[0] - tail.rect.center[0])
+                    left_danger.append(self.rect.center[0] - tail.rect.center[0])
 
             if tail.rect.center[0] == self.rect.center[0]:
-                            if tail.rect.center[1] > self.rect.center[1]:
-                                up_danger.append(tail.rect.center[1] - self.rect.center[1])
-                            else:
-                                down_danger.append(self.rect.center[1] - tail.rect.center[1])
+                if tail.rect.center[1] > self.rect.center[1]:
+                    down_danger.append(tail.rect.center[1] - self.rect.center[1])
+                else:
+                    up_danger.append(self.rect.center[1] - tail.rect.center[1])
 
         return min(up_danger), min(right_danger), min(left_danger), min(down_danger)
 
