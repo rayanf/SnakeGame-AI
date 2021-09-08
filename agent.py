@@ -7,6 +7,8 @@ from model import Linear_QNet, QTrainer
 import pygame
 # from helper import plot
 
+
+pygame.init()
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
 LR = 0.001

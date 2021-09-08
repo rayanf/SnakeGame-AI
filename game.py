@@ -83,12 +83,12 @@ class snake_game:
         return reward, done, self.snake.length
 
     def update_screen(self):
-        # score_font = pygame.font.SysFont("comicsansms", 25) 
+        score_font = pygame.font.SysFont("comicsansms", 25) 
 
-        # value = score_font.render("Score: " + str(self.snake.length), True, (255, 255, 102))
+        value = score_font.render("Score: " + str(self.snake.length), True, (255, 255, 102))
 
         self.screen.fill((50, 153, 213))
-        # self.screen.blit(value, [0, 0])
+        self.screen.blit(value, [0, 0])
         self.snakeGroup.draw(self.screen)  
         self.foods.draw(self.screen) 
         self.snake.tailsObject.draw(self.screen) 
