@@ -97,8 +97,10 @@ class Food(pygame.sprite.Sprite):
 
 
 def generate_food(food_group):
-    x = random.randint(0,600)
-    y = random.randint(0,600)
+    x = random.randint(0,29)*20 + 10
+    y = random.randint(0,29)*20 + 10
+
+
 
     food = Food([x,y])
     food.image.fill((110, 215, 45))
@@ -169,7 +171,7 @@ def reset(player):
 def Snake_game():  
     pygame.init()  
     clock = pygame.time.Clock()  
-    fps = 25
+    fps = 10
     bg = (50, 153, 213)
   
     size =[600, 600]  
