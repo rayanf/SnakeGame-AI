@@ -18,7 +18,7 @@ class Player(pygame.sprite.Sprite):
         self.headPos = pos
         self.length = 0
         self.tails = []
-        self.health = 1
+        self.health = 3
     
     def get_direction(self,pressed):
         for i in range(4):
@@ -114,8 +114,7 @@ def generate_food(food_group,player):
 
     return [x,y]
 
-def hit():
-    pass
+
 
 class Tail(pygame.sprite.Sprite):  
     def __init__(self, pos):  
@@ -146,10 +145,15 @@ def Health_trigger(player):
         return False
 
 def body_trigger(player):
-    reset(player)
-    player.health -= 1
-    return True
+    for tail in player.tails:
+
+        if player.rect.center == tail.rect.center:
+            player.health -= 1
+            reset(player)
+            return True
         
+    return False
+
 def Display_score(player,score,screen):
     score_font = pygame.font.SysFont("comicsansms", 25) 
     value = score_font.render("Score: " + str(score), True, (255, 255, 102))
@@ -172,7 +176,7 @@ def reset(player):
 def Snake_game():  
     pygame.init()  
     clock = pygame.time.Clock()  
-    fps = 25
+    fps = 10
     bg = (50, 153, 213)
   
     size =[600, 600]  
@@ -191,6 +195,7 @@ def Snake_game():
     GameOver = False
     while not GameOver:  
         wall_trigger(player)
+        body_trigger(player)    
         GameOver = Health_trigger(player)
 
         screen.fill(bg)  
@@ -203,8 +208,10 @@ def Snake_game():
         player.run()
         player.tail_run()
 
-        if pygame.sprite.spritecollide(player, food_group, True) : eat(food_group,tail_group, player)            
-        if pygame.sprite.spritecollide(player, tail_group, True) : body_trigger(player)
+        hit = pygame.sprite.spritecollide(player, food_group, True)  
+        if hit:
+            eat(food_group,tail_group, player)
+            
 
         Display_score(player,player.length,screen)
         player_group.draw(screen)  
