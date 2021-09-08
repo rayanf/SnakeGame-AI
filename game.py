@@ -17,7 +17,7 @@ class snake_game:
         self.snakeGroup = pygame.sprite.Group()
         self.snakeGroup.add(self.snake) 
         self.foods = pygame.sprite.Group()
-        self.currentfood = Food((110,70))
+
 
     def reset(self):
         self.snake.rect.center = (290,290)
@@ -27,18 +27,16 @@ class snake_game:
         self.snake.tailsObject = pygame.sprite.Group()
         self.foods = pygame.sprite.Group()
         self.screen = pygame.display.set_mode([self.w,self.h])  
-        self.framIter = 0 
-        self.currentfood = Food([110, 70])  
-        self.foods.add(self.currentfood)
+        self.framIter = 0          
+        # self.foods.add(self.currentfood)
         self.update_screen()
+        self.generate_food()
 
 
     def crash(self):
         if self.snake.rect.center[0] not in range(0,self.w) or self.snake.rect.center[1] not in range(0,self.w):
-            self.reset()
             return True
         elif pygame.sprite.spritecollide(self.snake, self.snake.tailsObject, True):
-            self.reset()
             return True 
         else: return False
 
@@ -75,7 +73,7 @@ class snake_game:
         self.snake.run()
         if self.crash():                    #check crash to waall or tails
             reward = -10
-            done  = True
+            done = True
         else: done = False    
 
         if self.eat(): reward = +10          #check eat foods
@@ -111,7 +109,7 @@ class Player(pygame.sprite.Sprite):
         self.vx = 20
         self.vy = 20
         self.rect.center = pos  
-        self.direction = pygame.K_RIGHT
+        self.direction = None
         self.length = 0
         self.tails = []
         self.tailsObject = pygame.sprite.Group()

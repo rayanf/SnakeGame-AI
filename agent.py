@@ -39,18 +39,47 @@ class Agent:
         
          
         up_danger, right_danger, left_danger, down_danger = game.snake.get_danger()
-        state = [
-            up_danger, right_danger, left_danger, down_danger,
+        if up_danger and dir_u < 100:
+            up_danger = 1
+        else :
+            up_danger = 0
+
+        if down_danger and dir_d < 100:
+            down_danger = 1
+        else :
+            down_danger = 0
+        
+        if right_danger and dir_r < 100:
+            right_danger = 1
+        else :
+            right_danger = 0
             
-            dir_l, dir_r, dir_u, dir_d,
+        if left_danger and dir_l < 100:
+            left_danger = 1
+        else :
+            left_danger = 0
+        
+        try:
+            state = [
+                up_danger, right_danger, left_danger, down_danger,
+                
+                dir_l, dir_r, dir_u, dir_d,
 
-            # Food location
-            game.currentfood.rect.center[0] < game.snake.rect.center[0],  # currentfood left
-            game.currentfood.rect.center[0] > game.snake.rect.center[0],  # currentfood right
-            game.currentfood.rect.center[1] < game.snake.rect.center[1],  # currentfood up
-            game.currentfood.rect.center[1] > game.snake.rect.center[1]  # currentfood down
-        ]
+                # Food location
+                game.currentfood.rect.center[0] < game.snake.rect.center[0],  # currentfood left
+                game.currentfood.rect.center[0] > game.snake.rect.center[0],  # currentfood right
+                game.currentfood.rect.center[1] < game.snake.rect.center[1],  # currentfood up
+                game.currentfood.rect.center[1] > game.snake.rect.center[1]  # currentfood down
+            ]
+        except:
+            state = [
+                up_danger, right_danger, left_danger, down_danger,
+                
+                dir_l, dir_r, dir_u, dir_d,
 
+                # Food location
+                0,0,0,0 # currentfood down
+            ]
         return np.array(state, dtype=int)
 
     def remember(self, state, action, reward, next_state, done):
@@ -73,17 +102,16 @@ class Agent:
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
         self.epsilon = 80 - self.n_games
-        final_move = [0, 0, 0, 0]
+        final_move = [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN]
         if random.randint(0, 200) < self.epsilon:
             move = random.randint(0, 2)
-            final_move[move] = 1
+            return final_move[move]
         else:
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
-            final_move[move] = 1
+            return final_move[move]
 
-        return final_move
 
 
 def train():
@@ -127,6 +155,7 @@ def train():
             mean_score = total_score / agent.n_games
             plot_mean_scores.append(mean_score)
             # plot(plot_scores, plot_mean_scores)
+            game.reset()
 
 
 if __name__ == '__main__':
