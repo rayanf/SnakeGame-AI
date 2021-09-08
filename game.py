@@ -2,7 +2,6 @@ import pygame
 import sys  
 import random
 
-
 class snake_game:
     def __init__(self):
         self.w = 600
@@ -18,7 +17,7 @@ class snake_game:
         self.snakeGroup = pygame.sprite.Group()
         self.snakeGroup.add(self.snake) 
         self.foods = pygame.sprite.Group()
-
+        self.currentfood = Food((110,70))
 
     def reset(self):
         self.snake.rect.center = (290,290)
@@ -29,22 +28,29 @@ class snake_game:
         self.foods = pygame.sprite.Group()
         self.screen = pygame.display.set_mode([self.w,self.h])  
         self.framIter = 0 
-        self.foods.add(Food([110, 70]) )
+        self.currentfood = Food([110, 70])  
+        self.foods.add(self.currentfood)
         self.update_screen()
 
 
     def crash(self):
         if self.snake.rect.center[0] not in range(0,self.w) or self.snake.rect.center[1] not in range(0,self.w):
             self.reset()
+            return True
         elif pygame.sprite.spritecollide(self.snake, self.snake.tailsObject, True):
             self.reset()
+            return True 
+        else: return False
 
     def eat(self):
         if  pygame.sprite.spritecollide(self.snake, self.foods, True):
             self.generate_food() 
             self.snake.length += 1
             self.snake.create_tail(self.snake.tailsObject)
+            return True
         
+        else: return False
+
     def generate_food(self):
         while True:
             x = random.randint(0,29)*20 + 10
@@ -58,25 +64,34 @@ class snake_game:
         food = Food([x,y])
         food.image.fill((110, 215, 45))
         self.foods.add(food)
+        self.currentfood = food
         return [x,y]
 
 
     def one_step(self,direction):
+        reward = 0
         self.framIter += 1
         self.snake.direction = direction
         self.snake.run()
-        self.crash()        #check crash to waall or tails
-        self.eat()          #check eat foods
+        if self.crash():                    #check crash to waall or tails
+            reward = -10
+            done  = True
+        else: done = False    
+
+        if self.eat(): reward = +10          #check eat foods
 
         self.update_screen()
         self.clock.tick(self.fps)  
 
+        return reward, done, self.snake.length
+
     def update_screen(self):
-        score_font = pygame.font.SysFont("comicsansms", 25) 
-        value = score_font.render("Score: " + str(self.snake.length), True, (255, 255, 102))
+        # score_font = pygame.font.SysFont("comicsansms", 25) 
+
+        # value = score_font.render("Score: " + str(self.snake.length), True, (255, 255, 102))
 
         self.screen.fill((50, 153, 213))
-        self.screen.blit(value, [0, 0])
+        # self.screen.blit(value, [0, 0])
         self.snakeGroup.draw(self.screen)  
         self.foods.draw(self.screen) 
         self.snake.tailsObject.draw(self.screen) 
@@ -96,7 +111,7 @@ class Player(pygame.sprite.Sprite):
         self.vx = 20
         self.vy = 20
         self.rect.center = pos  
-        self.direction = None
+        self.direction = pygame.K_RIGHT
         self.length = 0
         self.tails = []
         self.tailsObject = pygame.sprite.Group()
@@ -156,15 +171,26 @@ class Player(pygame.sprite.Sprite):
         tail_group.add(tail)
         self.tails.append(tail)
 
+    def get_danger(self):
+        up_danger = [abs(0 - self.rect.center[1])]
+        right_danger = [abs(600 - self.rect.center[0])]
+        down_danger = [abs(600 - self.rect.center[1])]
+        left_danger = [abs(0 - self.rect.center[0])]
 
+        for tail in self.tails:
+            if tail.rect.center[1] == self.rect.center[1]:
+                if tail.rect.center[0] > self.rect.center[0]:
+                    left_danger.append(tail.rect.center[0] - self.rect.center[0])
+                else:
+                    right_danger.append(self.rect.center[0] - tail.rect.center[0])
 
-class Food(pygame.sprite.Sprite):  
-    def __init__(self, pos):  
-        pygame.sprite.Sprite.__init__(self)  
-        self.image = pygame.Surface([20, 20])  
-        self.rect = self.image.get_rect()  
-        self.rect.center = pos  
-        self.image.fill((110, 215, 45))  
+            if tail.rect.center[0] == self.rect.center[0]:
+                            if tail.rect.center[1] > self.rect.center[1]:
+                                up_danger.append(tail.rect.center[1] - self.rect.center[1])
+                            else:
+                                down_danger.append(self.rect.center[1] - tail.rect.center[1])
+
+        return min(up_danger), min(right_danger), min(left_danger), min(down_danger)
 
 
 
@@ -181,14 +207,26 @@ class Tail(pygame.sprite.Sprite):
         self.vy = 20
 
 
-pygame.init()
+
+
+class Food(pygame.sprite.Sprite):  
+    def __init__(self, pos):  
+        pygame.sprite.Sprite.__init__(self)  
+        self.image = pygame.Surface([20, 20])  
+        self.rect = self.image.get_rect()  
+        self.rect.center = pos  
+        self.image.fill((110, 215, 45))  
+
+
+
 
 
 
 if __name__ == '__main__':  
+    pygame.init()
     game = snake_game()
     game.reset()
-
+    
     while True:
         game.one_step(pygame.K_UP)
-        game.one_step(pygame.K_LEFT)
+        game.one_step(pygame.K_DOWN)
