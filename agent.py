@@ -41,22 +41,22 @@ class Agent:
          
         up_danger, right_danger, left_danger, down_danger = game.snake.get_danger()
 
-        if up_danger and dir_u < 40:
+        if up_danger < 40 and dir_u :
             up_danger = 1
         else :
             up_danger = 0
 
-        if down_danger and dir_d < 40:
+        if down_danger < 40 and dir_d :
             down_danger = 1
         else :
             down_danger = 0
         
-        if right_danger and dir_r < 40:
+        if right_danger < 40 and dir_r :
             right_danger = 1
         else :
             right_danger = 0
             
-        if left_danger and dir_l < 40:
+        if left_danger < 40 and dir_l :
             left_danger = 1
         else :
             left_danger = 0
@@ -108,6 +108,7 @@ class Agent:
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
             return  self.relativ_to_absolute(final_move[move],game.snake.direction)
+
 
     def relativ_to_absolute(self,relativeDirect,curentDirect):
         relativD = {'forward':0,'left':1,'right':-1}
