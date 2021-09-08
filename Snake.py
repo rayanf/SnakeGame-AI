@@ -153,10 +153,10 @@ def body_trigger(player):
 def Display_score(player,score,screen):
     score_font = pygame.font.SysFont("comicsansms", 25) 
     value = score_font.render("Score: " + str(score), True, (255, 255, 102))
-    health = score_font.render("Health: " + str(player.health), True, (255, 255, 102))
+    # health = score_font.render("Health: " + str(player.health), True, (255, 255, 102))
 
     screen.blit(value, [0, 0])
-    screen.blit(health, [250, 0])
+    # screen.blit(health, [250, 0])
  
 def eat(food_group ,tail_group ,player):
     generate_food(food_group,player) 
@@ -182,7 +182,7 @@ def Snake_game():
     player_group = pygame.sprite.Group()  
     player_group.add(player)  
 
-    food = Food([100, 60])  
+    food = Food([110, 70])  
     food_group = pygame.sprite.Group()  
     food_group.add(food)  
   
