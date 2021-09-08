@@ -84,6 +84,8 @@ class Player(pygame.sprite.Sprite):
         tail_group.add(tail)
         self.tails.append(tail)
 
+
+
 class Food(pygame.sprite.Sprite):  
     def __init__(self, pos):  
         pygame.sprite.Sprite.__init__(self)  
@@ -91,6 +93,8 @@ class Food(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()  
         self.rect.center = pos  
         self.image.fill((110, 215, 45))  
+
+
 
 def generate_food(food_group):
     x = random.randint(0,600)
@@ -103,6 +107,8 @@ def generate_food(food_group):
 
     return [x,y]
 
+
+
 class Tail(pygame.sprite.Sprite):  
     def __init__(self, pos):  
         pygame.sprite.Sprite.__init__(self)  
@@ -112,7 +118,7 @@ class Tail(pygame.sprite.Sprite):
         self.image.fill((255, 100, 255)) 
         self.Direction = None
         self.move = [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN]  
-        self.vx = 20
+        self.vx = 20 
         self.vy = 20
     
 
@@ -163,7 +169,7 @@ def reset(player):
 def Snake_game():  
     pygame.init()  
     clock = pygame.time.Clock()  
-    fps = 13
+    fps = 25
     bg = (50, 153, 213)
   
     size =[600, 600]  
