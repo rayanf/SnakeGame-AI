@@ -96,11 +96,16 @@ class Food(pygame.sprite.Sprite):
 
 
 
-def generate_food(food_group):
-    x = random.randint(0,29)*20 + 10
-    y = random.randint(0,29)*20 + 10
-
-
+def generate_food(food_group,player):
+    while True:
+        x = random.randint(0,29)*20 + 10
+        y = random.randint(0,29)*20 + 10
+        for tail in player.tails:
+            if tail.rect.center == (x,y):
+                pass
+        else:
+            break
+    
 
     food = Food([x,y])
     food.image.fill((110, 215, 45))
@@ -158,7 +163,7 @@ def Display_score(player,score,screen):
     screen.blit(health, [250, 0])
  
 def eat(food_group ,tail_group ,player):
-    generate_food(food_group) 
+    generate_food(food_group,player) 
     player.length += 1
     player.create_tail(tail_group)
 
