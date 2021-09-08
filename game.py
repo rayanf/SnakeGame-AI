@@ -21,7 +21,7 @@ class snake_game:
 
     def reset(self):
         self.snake.rect.center = (290,290)
-        self.snake.direction = None
+        self.snake.direction = pygame.K_UP
         self.snake.length = 0
         self.snake.tails = []
         self.snake.tailsObject = pygame.sprite.Group()
@@ -108,7 +108,7 @@ class Player(pygame.sprite.Sprite):
         self.vx = 20
         self.vy = 20
         self.rect.center = pos  
-        self.direction = None
+        self.direction = pygame.K_UP
         self.length = 0
         self.tails = []
         self.tailsObject = pygame.sprite.Group()

@@ -41,30 +41,36 @@ class Agent:
          
         up_danger, right_danger, left_danger, down_danger = game.snake.get_danger()
 
-        if up_danger and dir_u < 20:
+        if up_danger and dir_u < 40:
             up_danger = 1
         else :
             up_danger = 0
 
-        if down_danger and dir_d < 20:
+        if down_danger and dir_d < 40:
             down_danger = 1
         else :
             down_danger = 0
         
-        if right_danger and dir_r < 20:
+        if right_danger and dir_r < 40:
             right_danger = 1
         else :
             right_danger = 0
             
-        if left_danger and dir_l < 20:
+        if left_danger and dir_l < 40:
             left_danger = 1
         else :
             left_danger = 0
-        
+
+        forward_danger, left_danger, right_danger = self.absolute_to_relative(game.snake.direction, [up_danger, right_danger, down_danger, left_danger,])
         state = [
-            forward_danger , right_danger, left_danger,
+            forward_danger,
+            left_danger,
+            right_danger,
             
-            dir_l , dir_r, dir_u, dir_d,
+            dir_l,
+            dir_r,
+            dir_u,
+            dir_d,
 
             game.currentfood.rect.center[0] < game.snake.rect.center[0],  
             game.currentfood.rect.center[0] > game.snake.rect.center[0],  
@@ -91,27 +97,28 @@ class Agent:
     def train_short_memory(self, state, action, reward, next_state, done):
         self.trainer.train_step(state, action, reward, next_state, done)
 
-    def get_action(self, state):
+    def get_action(self, state, game):
         self.epsilon = 80 - self.n_games
         final_move = ['forward' ,'left' ,'right']
         if random.randint(0, 200) < self.epsilon:
             move = random.randint(0, 2)
-            return self.relativ_to_absolute(final_move[move])
+            return self.relativ_to_absolute(final_move[move],game.snake.direction)
         else:
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
-            return  self.relativ_to_absolute(final_move[move])
+            return  self.relativ_to_absolute(final_move[move],game.snake.direction)
 
     def relativ_to_absolute(self,relativeDirect,curentDirect):
         relativD = {'forward':0,'left':1,'right':-1}
         directions = [pygame.K_UP,pygame.K_RIGHT, pygame.K_DOWN, pygame.K_LEFT]
         curentDirectIndex = directions.index(curentDirect)
-        relativDirection = directions[curentDirectIndex - relativD[relativeDirect]]
+        relativDirection = directions[(curentDirectIndex - relativD[relativeDirect])%4]
         return relativDirection
 
-    # def absolute_to_relative_(self,absoluteDirect,curentDirect):
-
+    def absolute_to_relative(self,curentDirect,Directions):
+        directIndex = {pygame.K_UP:0,pygame.K_RIGHT:1, pygame.K_DOWN:2, pygame.K_LEFT:3}
+        return (Directions[(directIndex[curentDirect]%4)], Directions[(directIndex[curentDirect]-1)%4], Directions[(directIndex[curentDirect]+1)%4])
 
 def train():
     plot_scores = []
@@ -124,7 +131,7 @@ def train():
     while True:
         state_old = agent.get_state(game)
 
-        final_move = agent.get_action(state_old)
+        final_move = agent.get_action(state_old,game)
 
         reward, done, score = game.one_step(final_move)
         state_new = agent.get_state(game)
