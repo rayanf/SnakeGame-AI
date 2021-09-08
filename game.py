@@ -7,13 +7,13 @@ class snake_game:
         self.w = 600
         self.h = 600
         self.snake_size = 20
-        self.fps = 20
+        self.fps = 40
 
         self.screen = pygame.display.set_mode([self.w,self.h])  
         self.clock = pygame.time.Clock()  
         self.framIter = 0
 
-        self.snake = Player([30,30])
+        self.snake = Player([290,290])
         self.snakeGroup = pygame.sprite.Group()
         self.snakeGroup.add(self.snake) 
         self.foods = pygame.sprite.Group()
@@ -28,7 +28,6 @@ class snake_game:
         self.foods = pygame.sprite.Group()
         self.screen = pygame.display.set_mode([self.w,self.h])  
         self.framIter = 0          
-        # self.foods.add(self.currentfood)
         self.update_screen()
         self.generate_food()
 

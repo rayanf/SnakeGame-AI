@@ -39,47 +39,48 @@ class Agent:
         
          
         up_danger, right_danger, left_danger, down_danger = game.snake.get_danger()
-        if up_danger and dir_u < 100:
+
+        if up_danger and dir_u < 30:
             up_danger = 1
         else :
             up_danger = 0
 
-        if down_danger and dir_d < 100:
+        if down_danger and dir_d < 30:
             down_danger = 1
         else :
             down_danger = 0
         
-        if right_danger and dir_r < 100:
+        if right_danger and dir_r < 30:
             right_danger = 1
         else :
             right_danger = 0
             
-        if left_danger and dir_l < 100:
+        if left_danger and dir_l < 30:
             left_danger = 1
         else :
             left_danger = 0
         
-        try:
-            state = [
-                up_danger, right_danger, left_danger, down_danger,
-                
-                dir_l, dir_r, dir_u, dir_d,
+        # try:
+        state = [
+            up_danger, right_danger, left_danger, down_danger,
+            
+            dir_l, dir_r, dir_u, dir_d,
 
-                # Food location
-                game.currentfood.rect.center[0] < game.snake.rect.center[0],  # currentfood left
-                game.currentfood.rect.center[0] > game.snake.rect.center[0],  # currentfood right
-                game.currentfood.rect.center[1] < game.snake.rect.center[1],  # currentfood up
-                game.currentfood.rect.center[1] > game.snake.rect.center[1]  # currentfood down
-            ]
-        except:
-            state = [
-                up_danger, right_danger, left_danger, down_danger,
+            # Food location
+            game.currentfood.rect.center[0] < game.snake.rect.center[0],  # currentfood left
+            game.currentfood.rect.center[0] > game.snake.rect.center[0],  # currentfood right
+            game.currentfood.rect.center[1] < game.snake.rect.center[1],  # currentfood up
+            game.currentfood.rect.center[1] > game.snake.rect.center[1]  # currentfood down
+        ]
+        # except:
+        #     state = [
+        #         up_danger, right_danger, left_danger, down_danger,
                 
-                dir_l, dir_r, dir_u, dir_d,
+        #         dir_l, dir_r, dir_u, dir_d,
 
-                # Food location
-                0,0,0,0 # currentfood down
-            ]
+        #         # Food location
+        #         0,0,0,0 # currentfood down
+        #     ]
         return np.array(state, dtype=int)
 
     def remember(self, state, action, reward, next_state, done):
@@ -100,11 +101,10 @@ class Agent:
         self.trainer.train_step(state, action, reward, next_state, done)
 
     def get_action(self, state):
-        # random moves: tradeoff exploration / exploitation
-        self.epsilon = 80 - self.n_games
-        final_move = [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN]
+        self.epsilon = 50 - self.n_games
+        final_move = [ pygame.K_RIGHT,pygame.K_LEFT, pygame.K_UP, pygame.K_DOWN]
         if random.randint(0, 200) < self.epsilon:
-            move = random.randint(0, 2)
+            move = random.randint(0, 3)
             return final_move[move]
         else:
             state0 = torch.tensor(state, dtype=torch.float)
@@ -121,6 +121,7 @@ def train():
     record = 0
     agent = Agent()
     game = snake_game()
+    game.reset()
     while True:
         # get old state
         state_old = agent.get_state(game)
@@ -128,19 +129,14 @@ def train():
         # get move
         final_move = agent.get_action(state_old)
 
-        # perform move and get new state
         reward, done, score = game.one_step(final_move)
         state_new = agent.get_state(game)
-
-        # train short memory
+    
         agent.train_short_memory(state_old, final_move, reward, state_new, done)
 
-        # remember
         agent.remember(state_old, final_move, reward, state_new, done)
 
         if done:
-            # train long memory, plot result
-            game.reset()
             agent.n_games += 1
             agent.train_long_memory()
 
