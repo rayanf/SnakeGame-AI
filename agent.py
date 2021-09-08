@@ -16,18 +16,19 @@ class Agent:
 
     def __init__(self):
         self.n_games = 0
-        self.epsilon = 0  # randomness
-        self.gamma = 0.9  # discount rate
-        self.memory = deque(maxlen=MAX_MEMORY)  # popleft()
-        self.model = Linear_QNet(12, 256, 4)
+        self.epsilon = 0 
+        self.gamma = 0.9  
+        self.memory = deque(maxlen=MAX_MEMORY) 
+        self.model = Linear_QNet(11, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
-        head = game.snake.rect.center
-        point_l = (head[0] - 10, head[1])
-        point_r = (head[0] + 10, head[1])
-        point_u = (head[0], head[1] - 10)
-        point_d = (head[0], head[1] + 10)
+        # head = game.snake.rect.center
+        # point_l = (head[0] - 10, head[1])
+        # point_r = (head[0] + 10, head[1])
+        # point_u = (head[0], head[1] - 10)
+        # point_d = (head[0], head[1] + 10)
+
 
         dir_l = game.snake.direction == pygame.K_LEFT
         dir_r = game.snake.direction == pygame.K_RIGHT
@@ -40,55 +41,45 @@ class Agent:
          
         up_danger, right_danger, left_danger, down_danger = game.snake.get_danger()
 
-        if up_danger and dir_u < 30:
+        if up_danger and dir_u < 20:
             up_danger = 1
         else :
             up_danger = 0
 
-        if down_danger and dir_d < 30:
+        if down_danger and dir_d < 20:
             down_danger = 1
         else :
             down_danger = 0
         
-        if right_danger and dir_r < 30:
+        if right_danger and dir_r < 20:
             right_danger = 1
         else :
             right_danger = 0
             
-        if left_danger and dir_l < 30:
+        if left_danger and dir_l < 20:
             left_danger = 1
         else :
             left_danger = 0
         
-        # try:
         state = [
-            up_danger, right_danger, left_danger, down_danger,
+            forward_danger , right_danger, left_danger,
             
-            dir_l, dir_r, dir_u, dir_d,
+            dir_l , dir_r, dir_u, dir_d,
 
-            # Food location
-            game.currentfood.rect.center[0] < game.snake.rect.center[0],  # currentfood left
-            game.currentfood.rect.center[0] > game.snake.rect.center[0],  # currentfood right
-            game.currentfood.rect.center[1] < game.snake.rect.center[1],  # currentfood up
-            game.currentfood.rect.center[1] > game.snake.rect.center[1]  # currentfood down
+            game.currentfood.rect.center[0] < game.snake.rect.center[0],  
+            game.currentfood.rect.center[0] > game.snake.rect.center[0],  
+            game.currentfood.rect.center[1] < game.snake.rect.center[1],  
+            game.currentfood.rect.center[1] > game.snake.rect.center[1]  
         ]
-        # except:
-        #     state = [
-        #         up_danger, right_danger, left_danger, down_danger,
-                
-        #         dir_l, dir_r, dir_u, dir_d,
-
-        #         # Food location
-        #         0,0,0,0 # currentfood down
-        #     ]
+    
         return np.array(state, dtype=int)
 
     def remember(self, state, action, reward, next_state, done):
-        self.memory.append((state, action, reward, next_state, done))  # popleft if MAX_MEMORY is reached
+        self.memory.append((state, action, reward, next_state, done))  
 
     def train_long_memory(self):
         if len(self.memory) > BATCH_SIZE:
-            mini_sample = random.sample(self.memory, BATCH_SIZE)  # list of tuples
+            mini_sample = random.sample(self.memory, BATCH_SIZE) 
         else:
             mini_sample = self.memory
 
@@ -101,17 +92,25 @@ class Agent:
         self.trainer.train_step(state, action, reward, next_state, done)
 
     def get_action(self, state):
-        self.epsilon = 50 - self.n_games
-        final_move = [ pygame.K_RIGHT,pygame.K_LEFT, pygame.K_UP, pygame.K_DOWN]
+        self.epsilon = 80 - self.n_games
+        final_move = ['forward' ,'left' ,'right']
         if random.randint(0, 200) < self.epsilon:
-            move = random.randint(0, 3)
-            return final_move[move]
+            move = random.randint(0, 2)
+            return self.relativ_to_absolute(final_move[move])
         else:
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
-            return final_move[move]
+            return  self.relativ_to_absolute(final_move[move])
 
+    def relativ_to_absolute(self,relativeDirect,curentDirect):
+        relativD = {'forward':0,'left':1,'right':-1}
+        directions = [pygame.K_UP,pygame.K_RIGHT, pygame.K_DOWN, pygame.K_LEFT]
+        curentDirectIndex = directions.index(curentDirect)
+        relativDirection = directions[curentDirectIndex - relativD[relativeDirect]]
+        return relativDirection
+
+    # def absolute_to_relative_(self,absoluteDirect,curentDirect):
 
 
 def train():
@@ -123,10 +122,8 @@ def train():
     game = snake_game()
     game.reset()
     while True:
-        # get old state
         state_old = agent.get_state(game)
 
-        # get move
         final_move = agent.get_action(state_old)
 
         reward, done, score = game.one_step(final_move)
