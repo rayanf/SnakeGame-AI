@@ -98,13 +98,13 @@ class Agent:
             return  self.relativ_to_absolute(final_move[move],game.snake.direction),final_move[move]
 
 
-    def relativ_to_absolute(self,relativeDirect,curentDirect):
+    def relativ_to_absolute(self,relativeDirect,curent_ABSdirection):
         relativD = {'forward':0,'left':1,'right':-1}
-        directions = [pygame.K_UP,pygame.K_RIGHT, pygame.K_DOWN, pygame.K_LEFT]
-        curentDirectIndex = directions.index(curentDirect)
-        relativDirection = directions[(curentDirectIndex - relativD[relativeDirect])%4]
-        return relativDirection
+        pygame_format_ABSdirection = [pygame.K_UP,pygame.K_RIGHT, pygame.K_DOWN, pygame.K_LEFT]
+        curent_ABSdirection_Index = pygame_format_ABSdirection.index(curent_ABSdirection)
+        ABS_direction = pygame_format_ABSdirection[(curent_ABSdirection_Index - relativD[relativeDirect])%4]
+        return ABS_direction
 
     def absolute_to_relative(self,curentDirect,Directions):
-        directIndex = {pygame.K_UP:0,pygame.K_RIGHT:1, pygame.K_DOWN:2, pygame.K_LEFT:3}
-        return (Directions[(directIndex[curentDirect]%4)], Directions[(directIndex[curentDirect]-1)%4], Directions[(directIndex[curentDirect]+1)%4])
+        direction_Index = {pygame.K_UP:0,pygame.K_RIGHT:1, pygame.K_DOWN:2, pygame.K_LEFT:3}
+        return (Directions[(direction_Index[curentDirect]%4)], Directions[(direction_Index[curentDirect]-1)%4], Directions[(direction_Index[curentDirect]+1)%4])
