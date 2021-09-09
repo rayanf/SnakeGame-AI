@@ -24,22 +24,11 @@ class Agent:
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
-        # head = game.snake.rect.center
-        # point_l = (head[0] - 10, head[1])
-        # point_r = (head[0] + 10, head[1])
-        # point_u = (head[0], head[1] - 10)
-        # point_d = (head[0], head[1] + 10)
-
-
         dir_l = game.snake.direction == pygame.K_LEFT
         dir_r = game.snake.direction == pygame.K_RIGHT
         dir_u = game.snake.direction == pygame.K_UP
         dir_d = game.snake.direction == pygame.K_DOWN
 
-
-
-        
-         
         up_danger, right_danger, left_danger, down_danger = game.snake.get_danger()
 
         if up_danger <= 20:
@@ -81,7 +70,7 @@ class Agent:
     
         return np.array(state, dtype=int)
 
-    def remember(self, state, action, reward, next_state, done):
+    def save_memory(self, state, action, reward, next_state, done):
         self.memory.append((state, action, reward, next_state, done))  
 
     def train_long_memory(self):
@@ -92,8 +81,6 @@ class Agent:
 
         states, actions, rewards, next_states, dones = zip(*mini_sample)
         self.trainer.train_step(states, actions, rewards, next_states, dones)
-        # for state, action, reward, nexrt_state, done in mini_sample:
-        #    self.trainer.train_step(state, action, reward, next_state, done)
 
     def train_short_memory(self, state, action, reward, next_state, done):
         self.trainer.train_step(state, action, reward, next_state, done)
