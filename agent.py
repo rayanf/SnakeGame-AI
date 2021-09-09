@@ -24,10 +24,10 @@ class Agent:
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
-        dir_l = game.snake.direction == pygame.K_LEFT
-        dir_r = game.snake.direction == pygame.K_RIGHT
-        dir_u = game.snake.direction == pygame.K_UP
-        dir_d = game.snake.direction == pygame.K_DOWN
+        l_direction = game.snake.direction == pygame.K_LEFT
+        r_direction = game.snake.direction == pygame.K_RIGHT
+        u_direction = game.snake.direction == pygame.K_UP
+        d_direction = game.snake.direction == pygame.K_DOWN
 
         up_danger, right_danger, left_danger, down_danger = game.snake.get_danger()
 
@@ -57,10 +57,10 @@ class Agent:
             left_danger,
             right_danger,
             
-            dir_l,
-            dir_r,
-            dir_u,
-            dir_d,
+            l_direction,
+            r_direction,
+            u_direction,
+            d_direction,
 
             game.currentfood.rect.center[0] < game.snake.rect.center[0],  
             game.currentfood.rect.center[0] > game.snake.rect.center[0],  
@@ -106,5 +106,5 @@ class Agent:
         return ABS_direction
 
     def absolute_to_relative(self,curentDirect,Directions):
-        direction_Index = {pygame.K_UP:0,pygame.K_RIGHT:1, pygame.K_DOWN:2, pygame.K_LEFT:3}
+        direction_Index = {pygame.K_UP : 0 ,pygame.K_RIGHT : 1 ,pygame.K_DOWN : 2 ,pygame.K_LEFT : 3 }
         return (Directions[(direction_Index[curentDirect]%4)], Directions[(direction_Index[curentDirect]-1)%4], Directions[(direction_Index[curentDirect]+1)%4])
