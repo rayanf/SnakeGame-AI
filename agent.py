@@ -3,7 +3,7 @@ import random
 import numpy as np
 from collections import deque
 from game import snake_game
-from model import Linear_QNet, QTrainer
+from model_torch import Linear_QNet, QTrainer
 import pygame
 
 
