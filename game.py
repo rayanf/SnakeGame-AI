@@ -71,7 +71,7 @@ class snake_game:
         self.snake.direction = direction
         self.snake.run()
         if self.crash():                    #check crash to waall or tails
-            reward = -10
+            reward = -20
             done = True
         else: done = False    
 
