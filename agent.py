@@ -5,7 +5,7 @@ from collections import deque
 from game import snake_game
 from model_torch import Linear_QNet, QTrainer
 import pygame
-from game import check_lock
+# from game import check_lock
 
 pygame.init()
 MAX_MEMORY = 100_000
@@ -20,7 +20,7 @@ class Agent:
         self.epsilon = 0 
         self.gamma = 0.95
         self.memory = deque(maxlen=MAX_MEMORY) 
-        self.model = Linear_QNet(13, 256, 32,3)
+        self.model = Linear_QNet(11, 256,3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
@@ -52,9 +52,7 @@ class Agent:
             left_danger = 0
 
         forward_danger, left_danger, right_danger = self.absolute_to_relative(game.snake.direction, [up_danger, right_danger, down_danger, left_danger,])
-        if forward_danger == 1:
-            lock_list = check_lock(game)
-        else: lock_list = [0,0,0]
+        forward_path,left_path,right_path = game.check_path()
 
         state = [
             forward_danger,
@@ -71,8 +69,9 @@ class Agent:
             game.currentfood.rect.center[1] < game.snake.rect.center[1],  
             game.currentfood.rect.center[1] > game.snake.rect.center[1],
 
-            lock_list[1],
-            lock_list[2]
+            forward_path,
+            left_path,
+            right_path
             
         ]
     
@@ -94,7 +93,7 @@ class Agent:
         self.trainer.train_step(state, action, reward, next_state, done)
 
     def get_action(self, state, game):
-        self.epsilon = 169 - self.n_games
+        self.epsilon = 80 - self.n_games
         final_move = ['forward' ,'left' ,'right']
         if random.randint(0, 200) < self.epsilon:
             move = random.randint(0, 2)
