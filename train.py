@@ -18,7 +18,7 @@ def train():
 
         pygame_format_move, string_format_move = agent.get_action(before_state,game)
 
-        reward, GameOver, score = game.one_step(pygame_format_move)
+        reward, GameOver, score = game.one_step(pygame_format_move,before_state[12:])
         game.update_screen()
         game.clock.tick(game.fps)  
         

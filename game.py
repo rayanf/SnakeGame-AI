@@ -47,6 +47,16 @@ class snake_game:
         
         else: return False
 
+    def lock_move_check(self,lock_list,old_direction):
+        relativD = ['forward','left','right']
+        
+        for i in range(2):
+            if lock_list[i] == 1:
+                if self.snake.direction == relativ_to_absolute(relativD[i],old_direction):
+                    return 1
+        return 0
+
+
     def generate_food(self):
         while True:
             x = random.randint(0,29)*20 + 10
@@ -64,15 +74,21 @@ class snake_game:
         return [x,y]
 
 
-    def one_step(self,direction):
+    def one_step(self,direction,lock_list):
         reward = 0
         self.framIter += 1
+        old_direction = self.snake.direction
         self.snake.direction = direction
         self.snake.run()
         if self.crash():                    #check crash to waall or tails
             reward = -10
             done = True
         else: done = False    
+
+        if self.lock_move_check(lock_list,old_direction):
+            reward = -10
+            done = True
+            print('lock')
 
         if self.eat(): reward = +10          #check eat foods
 
@@ -106,36 +122,56 @@ def absolute_to_relative(curentDirect,Directions):
 
 
 
-# def check_lock(game):
-#     actions = ['forward' ,'left' ,'right']
-#     for act in range(2):
-#         actions[act] = check_lock()
     
 def is_fuck(game):
     u_d ,r_d ,l_d ,d_d = game.snake.get_danger()
-    if game.snake.direction == pygame.K_UP: return u_d
-    elif game.snake.direction == pygame.K_RIGHT: return r_d
-    elif game.snake.direction == pygame.K_LEFT: return l_d
-    elif game.snake.direction == pygame.K_DOWN: return d_d
+    if  u_d == 1 and r_d == 1 and l_d == 1 and d_d == 1:
+        return 1
 
 
-def is_safe(game):
+def is_safe(game,act='forward'):
+    if game.snake.direction == pygame.K_UP:
+        # print('ok')
+        if (game.snake.rect.center[1] - 0) / 20 >= game.snake.length:
+            for tail in game.snake.tails:
+                if tail.rect.center[0] < game.snake.rect.center[0]:
+                    return False
+            else: return True
 
-    pass
+
+    elif game.snake.direction == pygame.K_RIGHT:
+        # print('ok1')
+
+        if (600 - game.snake.rect.center[0]) / 20 >= game.snake.length:
+            for tail in game.snake.tails:
+                if tail.rect.center[1] > game.snake.rect.center[1]:
+                    return False
+            else: return True
+
+    elif game.snake.direction == pygame.K_LEFT:
+        # print('ok2')
+
+        if (game.snake.rect.center[0] - 0) / 20 >= game.snake.length:
+            for tail in game.snake.tails:
+                if tail.rect.center[1] < game.snake.rect.center[1]:
+                    return False
+            else: return True
+
+    elif game.snake.direction == pygame.K_DOWN:
+        # print('ok3')
+
+        if (600 - game.snake.rect.center[1]) / 20 >= game.snake.length:
+            for tail in game.snake.tails:
+                if tail.rect.center[0] > game.snake.rect.center[0]:
+                    return False
+            else: return True
 
 
-def is_lock(game):
+def check_lock(game):
     actions = ['forward' ,'left' ,'right']
     danger_list = [0,0,0]
 
-    for act in range(2):
-        if is_safe(game):
-            danger_list[act] = 0
-            return 0
-
-        if is_fuck(game):
-            danger_list[act] = 1
-            continue
+    for act in range(2): 
 
         temp_game = snake_game()
         temp_game.snakeGroup = pygame.sprite.Group()
@@ -146,9 +182,46 @@ def is_lock(game):
         temp_game.snake.tails = game.snake.tails
         temp_game.snake.tailsObject = game.snake.tailsObject
         abs_action = relativ_to_absolute(actions[act], temp_game.snake.direction)
-        reward, done, temp_game.snake.length = temp_game.one_step(abs_action)
-        
+        reward, done, temp_game.snake.length = temp_game.one_step(abs_action,[0,0,0])
+        if done:
+            danger_list[act] = 1
+
+        else: 
+            danger_list[act] = is_lock(temp_game)   
+    return danger_list
+
+def is_lock(game):
+    actions = ['forward' ,'left' ,'right']
+    danger_list = [0,0,0]
+
+    for act in range(2):
+        # print('hah')
+
+        if is_fuck(game):
+            danger_list[act] = 1
+            return 1
+
+        temp_game = snake_game()
+        temp_game.snakeGroup = pygame.sprite.Group()
+        temp_game.foods = game.foods
+        temp_game.snake.rect.center = game.snake.rect.center
+        temp_game.snake.length = game.snake.length
+        temp_game.snake.direction = game.snake.direction
+        temp_game.snake.tails = game.snake.tails
+        temp_game.snake.tailsObject = game.snake.tailsObject
+        abs_action = relativ_to_absolute(actions[act], temp_game.snake.direction)
+        reward, done, temp_game.snake.length = temp_game.one_step(abs_action,[0,0,0])
+        if done:
+            danger_list[act] = 1
+            del temp_game
+            continue
+
+        if is_safe(temp_game):
+            danger_list[act] = 0
+            return 0
+
         danger_list[act] = is_lock(temp_game)
+        del temp_game
 
     return 1
      
@@ -275,10 +348,4 @@ class Food(pygame.sprite.Sprite):
 
 
 if __name__ == '__main__':  
-    pygame.init()
-    game = snake_game()
-    game.reset()
-    
-    while True:
-        game.one_step(pygame.K_UP)
-        game.one_step(pygame.K_DOWN)
+    pass

@@ -5,7 +5,7 @@ from collections import deque
 from game import snake_game
 from model_torch import Linear_QNet, QTrainer
 import pygame
-
+from game import check_lock
 
 pygame.init()
 MAX_MEMORY = 100_000
@@ -20,7 +20,7 @@ class Agent:
         self.epsilon = 0 
         self.gamma = 0.97 
         self.memory = deque(maxlen=MAX_MEMORY) 
-        self.model = Linear_QNet(11, 256, 3)
+        self.model = Linear_QNet(14, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
@@ -52,6 +52,10 @@ class Agent:
             left_danger = 0
 
         forward_danger, left_danger, right_danger = self.absolute_to_relative(game.snake.direction, [up_danger, right_danger, down_danger, left_danger,])
+        if forward_danger == 1:
+            lock_list = check_lock(game)
+        else: lock_list = [0,0,0]
+
         state = [
             forward_danger,
             left_danger,
@@ -65,7 +69,12 @@ class Agent:
             game.currentfood.rect.center[0] < game.snake.rect.center[0],  
             game.currentfood.rect.center[0] > game.snake.rect.center[0],  
             game.currentfood.rect.center[1] < game.snake.rect.center[1],  
-            game.currentfood.rect.center[1] > game.snake.rect.center[1]  
+            game.currentfood.rect.center[1] > game.snake.rect.center[1],
+
+            lock_list[0],
+            lock_list[1],
+            lock_list[2]
+            
         ]
     
         return np.array(state, dtype=int)
