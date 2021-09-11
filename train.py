@@ -18,7 +18,8 @@ def train():
 
         pygame_format_move, string_format_move = agent.get_action(before_state,game)
 
-        reward, GameOver, score = game.one_step(pygame_format_move,before_state[12:])
+        reward, GameOver, score = game.one_step(pygame_format_move,before_state[11:])
+        # print(before_state[11:])
         game.update_screen()
         game.clock.tick(game.fps)  
         
@@ -33,6 +34,7 @@ def train():
         agent.save_memory(before_state, pygame_format_move, reward, after_state, GameOver)
 
         if GameOver:
+            print(game.snake.rect.center)
             agent.n_games += 1
             agent.train_long_memory()
 

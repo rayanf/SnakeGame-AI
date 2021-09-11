@@ -18,9 +18,9 @@ class Agent:
     def __init__(self):
         self.n_games = 0
         self.epsilon = 0 
-        self.gamma = 0.97 
+        self.gamma = 0.95
         self.memory = deque(maxlen=MAX_MEMORY) 
-        self.model = Linear_QNet(14, 256, 3)
+        self.model = Linear_QNet(13, 256, 32,3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
@@ -71,7 +71,6 @@ class Agent:
             game.currentfood.rect.center[1] < game.snake.rect.center[1],  
             game.currentfood.rect.center[1] > game.snake.rect.center[1],
 
-            lock_list[0],
             lock_list[1],
             lock_list[2]
             
@@ -95,7 +94,7 @@ class Agent:
         self.trainer.train_step(state, action, reward, next_state, done)
 
     def get_action(self, state, game):
-        self.epsilon = 120 - self.n_games
+        self.epsilon = 169 - self.n_games
         final_move = ['forward' ,'left' ,'right']
         if random.randint(0, 200) < self.epsilon:
             move = random.randint(0, 2)
