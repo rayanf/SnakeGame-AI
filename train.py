@@ -38,7 +38,7 @@ def train():
                 record = score
                 agent.model.save()
 
-            print('Game: ', agent.n_games, 'Score:', score, 'Record:', record)
+            print('Game:', agent.n_games, 'Score:', score, 'Record:', record)
 
             plot_scores.append(score)
             Tscore += score
