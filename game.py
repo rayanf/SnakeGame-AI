@@ -117,33 +117,53 @@ class snake_game:
 
         return current_point
 
+    def check_into_ground(self,point):
+        if point[0] < 600 and point[0] > 0 and point[1] > 0 and point[1] < 600:
+            return True
+        else: return False
+
+
+
     def check_path(self):
-        self.remove_tails_graph()
+        graph = self.graph.copy()
+        graph = self.remove_tails_graph(graph)
 
         forward_point = self.get_next_move_pos('forward')
-        forward_path = nx.has_path(self.graph, self.get_graph_node(forward_point), self.get_graph_node(self.currentfood.rect.center))
+        try:
+            if self.check_into_ground(forward_point):
+                forward_path = nx.has_path(graph, self.get_graph_node(forward_point), self.get_graph_node(self.currentfood.rect.center))
+            else: forward_path = False
+        except : forward_path = False
+        try:
+            left_point = self.get_next_move_pos('left')
+            if self.check_into_ground(left_point):
+                left_path = nx.has_path(graph, self.get_graph_node(left_point), self.get_graph_node(self.currentfood.rect.center))
+            else: left_path = False
+        except : left_path = False
 
-        left_point = self.get_next_move_pos('left')
-        left_path = nx.has_path(self.graph, self.get_graph_node(left_point), self.get_graph_node(self.currentfood.rect.center))
-    
-        right_point = self.get_next_move_pos('right')
-        right_path = nx.has_path(self.graph, self.get_graph_node(right_point), self.get_graph_node(self.currentfood.rect.center))
-
-        self.graph.add_edges_from(edges)
-
-        return forward_path, left_path, right_path 
+        try:
+            right_point = self.get_next_move_pos('right')
+            if self.check_into_ground(right_point):
+                right_path = nx.has_path(graph, self.get_graph_node(right_point), self.get_graph_node(self.currentfood.rect.center))
+            else: right_path = False
+        except: right_path = False
+        # self.graph.add_edges_from(edges)
+        del graph
+        return (forward_path, left_path, right_path )
 
     def get_graph_node(self,point):
         node = int(str(point[0]) + str(point[1]))
         return node
 
-    def remove_tails_graph(self):
+    def remove_tails_graph(self,graph):
         nodes = []
         for tail in self.snake.tails:
             nodes.append(self.get_graph_node(tail.rect.center))
-        nodes.append(self.get_graph_node(self.snake.rect.center))
-
-        self.graph.remove_nodes_from(nodes)
+        if self.check_into_ground(self.snake.rect.center):
+            nodes.append(self.get_graph_node(self.snake.rect.center))
+        
+        graph.remove_nodes_from(nodes)
+        return graph
 
 
 
