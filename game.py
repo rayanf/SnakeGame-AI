@@ -1,7 +1,6 @@
 import pygame  
 import sys  
 import random
-
 class snake_game:
     def __init__(self):
         self.w = 600
@@ -77,9 +76,6 @@ class snake_game:
 
         if self.eat(): reward = +10          #check eat foods
 
-        self.update_screen()
-        self.clock.tick(self.fps)  
-
         return reward, done, self.snake.length
 
     def update_screen(self):
@@ -97,6 +93,65 @@ class snake_game:
         pygame.display.flip()
 
 
+def relativ_to_absolute(relativeDirect,curent_ABSdirection):
+        relativD = {'forward':0,'left':1,'right':-1}
+        pygame_format_ABSdirection = [pygame.K_UP,pygame.K_RIGHT, pygame.K_DOWN, pygame.K_LEFT]
+        curent_ABSdirection_Index = pygame_format_ABSdirection.index(curent_ABSdirection)
+        ABS_direction = pygame_format_ABSdirection[(curent_ABSdirection_Index - relativD[relativeDirect])%4]
+        return ABS_direction
+
+def absolute_to_relative(curentDirect,Directions):
+    direction_Index = {pygame.K_UP : 0 ,pygame.K_RIGHT : 1 ,pygame.K_DOWN : 2 ,pygame.K_LEFT : 3 }
+    return (Directions[(direction_Index[curentDirect]%4)], Directions[(direction_Index[curentDirect]-1)%4], Directions[(direction_Index[curentDirect]+1)%4])
+
+
+
+# def check_lock(game):
+#     actions = ['forward' ,'left' ,'right']
+#     for act in range(2):
+#         actions[act] = check_lock()
+    
+def is_fuck(game):
+    u_d ,r_d ,l_d ,d_d = game.snake.get_danger()
+    if game.snake.direction == pygame.K_UP: return u_d
+    elif game.snake.direction == pygame.K_RIGHT: return r_d
+    elif game.snake.direction == pygame.K_LEFT: return l_d
+    elif game.snake.direction == pygame.K_DOWN: return d_d
+
+
+def is_safe(game):
+
+    pass
+
+
+def is_lock(game):
+    actions = ['forward' ,'left' ,'right']
+    danger_list = [0,0,0]
+
+    for act in range(2):
+        if is_safe(game):
+            danger_list[act] = 0
+            return 0
+
+        if is_fuck(game):
+            danger_list[act] = 1
+            continue
+
+        temp_game = snake_game()
+        temp_game.snakeGroup = pygame.sprite.Group()
+        temp_game.foods = game.foods
+        temp_game.snake.rect.center = game.snake.rect.center
+        temp_game.snake.length = game.snake.length
+        temp_game.snake.direction = game.snake.direction
+        temp_game.snake.tails = game.snake.tails
+        temp_game.snake.tailsObject = game.snake.tailsObject
+        abs_action = relativ_to_absolute(actions[act], temp_game.snake.direction)
+        reward, done, temp_game.snake.length = temp_game.one_step(abs_action)
+        
+        danger_list[act] = is_lock(temp_game)
+
+    return 1
+     
 
 class Player(pygame.sprite.Sprite):  
     def __init__(self, pos):  

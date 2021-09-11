@@ -19,7 +19,9 @@ def train():
         pygame_format_move, string_format_move = agent.get_action(before_state,game)
 
         reward, GameOver, score = game.one_step(pygame_format_move)
-
+        game.update_screen()
+        game.clock.tick(game.fps)  
+        
         after_state = agent.get_state(game)
 
         train_vector = [0,0,0]
