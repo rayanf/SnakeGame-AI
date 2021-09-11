@@ -1,6 +1,8 @@
 import pygame  
 import sys  
 import random
+import networkx as nx
+from edges import edges
 class snake_game:
     def __init__(self):
         self.w = 600
@@ -16,8 +18,10 @@ class snake_game:
         self.snakeGroup = pygame.sprite.Group()
         self.snakeGroup.add(self.snake) 
         self.foods = pygame.sprite.Group()
-
-
+        
+        self.graph = nx.Graph()
+        self.graph.add_edges_from(edges)
+        
     def reset(self):
         self.snake.rect.center = (290,290)
         self.snake.direction = pygame.K_UP
@@ -98,6 +102,49 @@ class snake_game:
         pygame.display.update()  
 
         pygame.display.flip()
+
+             
+    def get_next_move_pos(self,direction):
+        abs_direction = relativ_to_absolute(direction,self.snake.direction)
+        current_point = self.snake.rect.center
+
+        for i in range(2):  
+            if abs_direction == self.snake.move[i]:  
+                current_point =  (current_point[0] + self.snake.vx * [-1, 1][i]  ,current_point[1])
+
+            elif abs_direction == self.snake.move[2:4][i]:  
+                current_point = (current_point[0] ,current_point[1] + self.snake.vy * [-1, 1][i])
+
+        return current_point
+
+    def check_path(self):
+        self.remove_tails_graph()
+
+        forward_point = self.get_next_move_pos('forward')
+        forward_path = nx.has_path(self.graph, self.get_graph_node(forward_point), self.get_graph_node(self.currentfood.rect.center))
+
+        left_point = self.get_next_move_pos('left')
+        left_path = nx.has_path(self.graph, self.get_graph_node(left_point), self.get_graph_node(self.currentfood.rect.center))
+    
+        right_point = self.get_next_move_pos('right')
+        right_path = nx.has_path(self.graph, self.get_graph_node(right_point), self.get_graph_node(self.currentfood.rect.center))
+
+        self.graph.add_edges_from(edges)
+
+        return forward_path, left_path, right_path 
+
+    def get_graph_node(self,point):
+        node = int(str(point[0]) + str(point[1]))
+        return node
+
+    def remove_tails_graph(self):
+        nodes = []
+        for tail in self.snake.tails:
+            nodes.append(self.get_graph_node(tail.rect.center))
+        nodes.append(self.get_graph_node(self.snake.rect.center))
+
+        self.graph.remove_nodes_from(nodes)
+
 
 
 def relativ_to_absolute(relativeDirect,curent_ABSdirection):

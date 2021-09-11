@@ -18,9 +18,9 @@ class Agent:
     def __init__(self):
         self.n_games = 0
         self.epsilon = 0 
-        self.gamma = 0.95
+        self.gamma = 0.96
         self.memory = deque(maxlen=MAX_MEMORY) 
-        self.model = Linear_QNet(11, 256,3)
+        self.model = Linear_QNet(14, 256,3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
