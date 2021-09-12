@@ -18,7 +18,7 @@ def train():
 
         pygame_format_move, string_format_move = agent.get_action(before_state,game)
 
-        reward, GameOver, score = game.one_step(pygame_format_move)
+        reward, GameOver, score = game.one_step(pygame_format_move,before_state[8:])
         game.update_screen()
         game.clock.tick(game.fps)  
         
@@ -41,7 +41,7 @@ def train():
                 record = score
                 agent.model.save()
 
-            print('Game: ', agent.n_games, 'Score:', score, 'Record:', record)
+            print('Game:', agent.n_games, 'Score:', score, 'Record:', record)
 
             plot_scores.append(score)
             Tscore += score

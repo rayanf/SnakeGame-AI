@@ -7,14 +7,17 @@ import os
 
 
 class Linear_QNet(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
+    def __init__(self, input_size, hid1, output_size):
         super().__init__()
-        self.inp_layer = nn.Linear(input_size, hidden_size)
-        self.hid_layer = nn.Linear(hidden_size, output_size)
+        self.inp_layer = nn.Linear(input_size, hid1)
+        # self.hid1 = nn.Linear(hid1, hid2)
+        self.hid1 = nn.Linear(hid1, output_size)
+
 
     def forward(self, x):
         x = Func.relu(self.inp_layer(x))
-        x = self.hid_layer(x)
+        # x = Func.relu(self.hid1(x))
+        x = self.hid1(x)
         return x
 
     def save(self, file_name='model.pth'):

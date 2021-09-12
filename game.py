@@ -68,23 +68,32 @@ class snake_game:
         self.currentfood = food
         return [x,y]
 
-
-    def one_step(self,direction):
+    def lock_move(self,old_direction,lock_list):
+        relativD = ['forward','left','right']
+        
+        for i in range(3):
+            if lock_list[i] == 0:
+                if self.snake.direction == relativ_to_absolute(relativD[i],old_direction):
+                    return True
+        return False
+        
+    def one_step(self,direction,lock_list):
         reward = 0
         self.framIter += 1
-        # old_direction = self.snake.direction
+        old_direction = self.snake.direction
         self.snake.direction = direction
         self.snake.run()
         if self.crash():                    #check crash to waall or tails
             reward = -10
             done = True
-        else: done = False    
+        elif self.lock_move(old_direction,lock_list): 
+            reward = -10
+            done = True
+            print('thats wrong')
+        else:
+            done = False    
 
-        # if self.lock_move_check(lock_list,old_direction):
-        #     reward = -10
-        #     done = True
-        #     # print('lock')
-
+        
         if self.eat(): reward = +10          #check eat foods
 
         return reward, done, self.snake.length

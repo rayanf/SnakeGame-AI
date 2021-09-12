@@ -20,7 +20,7 @@ class Agent:
         self.epsilon = 0 
         self.gamma = 0.96
         self.memory = deque(maxlen=MAX_MEMORY) 
-        self.model = Linear_QNet(14, 256,3)
+        self.model = Linear_QNet(11, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
@@ -55,9 +55,9 @@ class Agent:
         forward_path,left_path,right_path = game.check_path()
 
         state = [
-            forward_danger,
-            left_danger,
-            right_danger,
+            # forward_danger,
+            # left_danger,
+            # right_danger,
             
             l_direction,
             r_direction,
@@ -93,9 +93,9 @@ class Agent:
         self.trainer.train_step(state, action, reward, next_state, done)
 
     def get_action(self, state, game):
-        self.epsilon = 80 - self.n_games
+        self.epsilon = 200 - self.n_games
         final_move = ['forward' ,'left' ,'right']
-        if random.randint(0, 200) < self.epsilon:
+        if random.randint(0, 400) < self.epsilon:
             move = random.randint(0, 2)
             return self.relativ_to_absolute(final_move[move],game.snake.direction),final_move[move]
         else:
