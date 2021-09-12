@@ -56,11 +56,15 @@ class snake_game:
         while True:
             x = random.randint(0,29)*20 + 10
             y = random.randint(0,29)*20 + 10
-            for tail in self.snake.tails:
-                if tail.rect.center == (x,y):
-                    pass
+            if (x,y) == self.snake.rect.center:
+                pass
             else:
-                break
+                for tail in self.snake.tails:
+                    if tail.rect.center == (x,y):
+                        pass
+                else:
+                    break
+            
 
         food = Food([x,y])
         food.image.fill((110, 215, 45))
