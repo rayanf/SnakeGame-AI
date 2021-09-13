@@ -54,6 +54,10 @@ class Agent:
         forward_danger, left_danger, right_danger = self.absolute_to_relative(game.snake.direction, [up_danger, right_danger, down_danger, left_danger,])
         forward_path,left_path,right_path = game.check_path()
 
+        if 1 not in  (forward_path,left_path,right_path):
+            forward_path,left_path,right_path = forward_danger, left_danger, right_danger
+            print('change feature')
+
         state = [
             # forward_danger,
             # left_danger,
