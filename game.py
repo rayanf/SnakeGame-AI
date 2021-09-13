@@ -44,9 +44,9 @@ class snake_game:
 
     def eat(self):
         if  pygame.sprite.spritecollide(self.snake, self.foods, True):
+            self.snake.create_tail()
             self.generate_food() 
             self.snake.length += 1
-            self.snake.create_tail(self.snake.tailsObject)
             return True
         
         else: return False
@@ -58,12 +58,12 @@ class snake_game:
             y = random.randint(0,29)*20 + 10
             if (x,y) == self.snake.rect.center:
                 pass
+
+            for tail in self.snake.tails:
+                if tail.rect.center == (x,y):
+                    pass
             else:
-                for tail in self.snake.tails:
-                    if tail.rect.center == (x,y):
-                        pass
-                else:
-                    break
+                break
             
 
         food = Food([x,y])
@@ -94,6 +94,7 @@ class snake_game:
             reward = -10
             done = True
             print('thats wrong')
+            print(lock_list)
         else:
             done = False    
 
@@ -160,7 +161,7 @@ class snake_game:
                 right_path = nx.has_path(graph, self.get_graph_node(right_point), self.get_graph_node(self.currentfood.rect.center))
             else: right_path = False
         except: right_path = False
-        # self.graph.add_edges_from(edges)
+
         del graph
         return (forward_path, left_path, right_path )
 
@@ -170,8 +171,8 @@ class snake_game:
 
     def remove_tails_graph(self,graph):
         nodes = []
-        for tail in self.snake.tails:
-            nodes.append(self.get_graph_node(tail.rect.center))
+        for tail in range(self.snake.length-1):
+            nodes.append(self.get_graph_node(self.snake.tails[tail].rect.center))
         if self.check_into_ground(self.snake.rect.center):
             nodes.append(self.get_graph_node(self.snake.rect.center))
         
@@ -251,7 +252,7 @@ class Player(pygame.sprite.Sprite):
                 tail.direction = temp_direction1
                 temp_direction1 = temp_direction2
 
-    def create_tail(self, tail_group):
+    def create_tail(self):
         for i in range(2):
                 if self.direction == self.move[i]:  
                     pos = (self.rect.center[0] - 20 * [-1, 1][i],self.rect.center[1])
@@ -260,8 +261,9 @@ class Player(pygame.sprite.Sprite):
                     pos = (self.rect.center[0],self.rect.center[1] - 20 * [-1, 1][i])
 
         tail = Tail(pos)
+ 
         tail.direction = self.direction
-        tail_group.add(tail)
+        self.tailsObject.add(tail)
         self.tails.append(tail)
 
     def get_danger(self):

@@ -2,6 +2,7 @@ from game import snake_game
 import pygame
 from agent import Agent
 from plot import plot
+import torch
 pygame.init()
 
 
@@ -13,6 +14,7 @@ def train():
     agent = Agent()
     game = snake_game()
     game.reset()
+    agent.model.load_state_dict(torch.load('./model/model.pth'))
     while True:
         before_state = agent.get_state(game)
 
