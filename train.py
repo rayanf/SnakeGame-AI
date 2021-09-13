@@ -14,7 +14,7 @@ def train():
     agent = Agent()
     game = snake_game()
     game.reset()
-    agent.model.load_state_dict(torch.load('./model/model.pth'))
+    # agent.model.load_state_dict(torch.load('./model/model.pth'))
     while True:
         before_state = agent.get_state(game)
 

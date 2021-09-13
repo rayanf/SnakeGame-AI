@@ -69,28 +69,34 @@ edges = [(1010, 3010), (3010, 5010), (5010, 7010), (7010, 9010), (9010, 11010), 
 
 
 if __name__ == '__main__':
-    pygame.init()
-    game = snake_game()
-    game.reset()
+    # pygame.init()
+    # game = snake_game()
+    # game.reset()
 
-    game.snake.rect.center = (30,10)
-    game.snake.tails.append(Tail((30,30)))
-    game.snake.tails.append(Tail((30,50)))
-    game.snake.tails.append(Tail((50,50)))
-    game.snake.tails.append(Tail((50,30)))
-    game.snake.tails.append(Tail((50,10)))
-    danger = game.check_path()
+    # game.snake.rect.center = (30,10)
+    # game.snake.tails.append(Tail((30,30)))
+    # game.snake.tails.append(Tail((30,50)))
+    # game.snake.tails.append(Tail((50,50)))
+    # game.snake.tails.append(Tail((50,30)))
+    # game.snake.tails.append(Tail((50,10)))
+    # danger = game.check_path()
     
-    x = 30
-    y = 10
-    # print(game.get_next_move_pos('left'))
-    if game.snake.rect.center == (x,y):
-        print(True)
-    else:
-        print(game.snake.rect.center)
-    game.one_step(pygame.K_LEFT, danger)
+    # x = 30
+    # y = 10
+    # # print(game.get_next_move_pos('left'))
+    # if game.snake.rect.center == (x,y):
+    #     print(True)
+    # else:
+    #     print(game.snake.rect.center)
+    # game.one_step(pygame.K_LEFT, danger)
     
     # print(pygame.KRIGHT)
+
+    pass
+
+
+
+
 
 
 

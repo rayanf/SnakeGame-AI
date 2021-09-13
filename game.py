@@ -54,15 +54,17 @@ class snake_game:
 
     def generate_food(self):
         while True:
+            check = 1
             x = random.randint(0,29)*20 + 10
             y = random.randint(0,29)*20 + 10
             if (x,y) == self.snake.rect.center:
-                continue
+                check = 0
 
             for tail in self.snake.tails:
                 if tail.rect.center == (x,y):
-                    continue
-            else:
+                    check = 0
+
+            if check ==  1:
                 break
             
 
@@ -82,6 +84,7 @@ class snake_game:
         return False
         
     def one_step(self,direction,lock_list):
+        done = False
         reward = 0
         self.framIter += 1
         old_direction = self.snake.direction
@@ -92,9 +95,15 @@ class snake_game:
             done = True
         elif self.lock_move(old_direction,lock_list): 
             reward = -10
-            done = True
-            print('thats wrong')
-            print(lock_list)
+            # done = True
+            # print('thats wrong')
+            # print(lock_list)
+            # print (self.currentfood.rect.center)
+            # print('----')
+            # if 1 not in lock_list:
+            #     print(self.snake.rect.center)
+            #     for tail in self.snake.tails:
+            #         print(tail.rect.center)
         else:
             done = False    
 
