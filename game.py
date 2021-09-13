@@ -57,11 +57,11 @@ class snake_game:
             x = random.randint(0,29)*20 + 10
             y = random.randint(0,29)*20 + 10
             if (x,y) == self.snake.rect.center:
-                pass
+                continue
 
             for tail in self.snake.tails:
                 if tail.rect.center == (x,y):
-                    pass
+                    continue
             else:
                 break
             

@@ -81,8 +81,13 @@ if __name__ == '__main__':
     game.snake.tails.append(Tail((50,10)))
     danger = game.check_path()
     
+    x = 30
+    y = 10
     # print(game.get_next_move_pos('left'))
-
+    if game.snake.rect.center == (x,y):
+        print(True)
+    else:
+        print(game.snake.rect.center)
     game.one_step(pygame.K_LEFT, danger)
     
     # print(pygame.KRIGHT)
