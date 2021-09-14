@@ -97,7 +97,7 @@ class Agent:
         self.trainer.train_step(state, action, reward, next_state, done)
 
     def get_action(self, state, game):
-        self.epsilon = 200 - self.n_games
+        self.epsilon = 0 - self.n_games
         final_move = ['forward' ,'left' ,'right']
         if random.randint(0, 400) < self.epsilon:
             move = random.randint(0, 2)
@@ -107,6 +107,13 @@ class Agent:
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
             return  self.relativ_to_absolute(final_move[move],game.snake.direction),final_move[move]
+
+    def play(self,state,game):
+        final_move = ['forward' ,'left' ,'right']
+        state0 = torch.tensor(state, dtype=torch.float)
+        prediction = self.model(state0)
+        move = torch.argmax(prediction).item()
+        return  self.relativ_to_absolute(final_move[move],game.snake.direction),final_move[move]
 
 
     def relativ_to_absolute(self,relativeDirect,curent_ABSdirection):

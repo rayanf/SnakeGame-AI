@@ -97,11 +97,11 @@ class snake_game:
             reward = -10
             # done = True
             # print('thats wrong')
-            # print(lock_list)
             # print (self.currentfood.rect.center)
             # print('----')
-            # if 1 not in lock_list:
-            #     print(self.snake.rect.center)
+            if 1 not in lock_list:
+                print(lock_list)    
+                # print(self.snake.rect.center)
             #     for tail in self.snake.tails:
             #         print(tail.rect.center)
         else:

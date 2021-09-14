@@ -1,12 +1,11 @@
-from game import snake_game
-import pygame
 from agent import Agent
-from plot import plot
+from game import snake_game
 import torch
-pygame.init()
+from plot import plot
 
 
-def train():
+def play():
+
     plot_scores = []
     plot_mean_scores = []
     Tscore = 0
@@ -15,29 +14,20 @@ def train():
     game = snake_game()
     game.reset()
     agent.model.load_state_dict(torch.load('./model/model.pth'))
+
     while True:
         before_state = agent.get_state(game)
 
-        pygame_format_move, string_format_move = agent.get_action(before_state,game)
+        pygame_format_move, string_format_move = agent.play(before_state,game)
 
         reward, GameOver, score = game.one_step(pygame_format_move,before_state[8:])
         game.update_screen()
         game.clock.tick(game.fps)  
         
-        after_state = agent.get_state(game)
 
-        train_vector = [0,0,0]
-        move_options = ['forward' ,'left' ,'right']
-        train_vector[move_options.index(string_format_move)] = 1
-
-        agent.train_short_memory(before_state, train_vector, reward, after_state, GameOver)
-
-        agent.save_memory(before_state, pygame_format_move, reward, after_state, GameOver)
 
         if GameOver:
-            # print(game.snake.rect.center)
             agent.n_games += 1
-            agent.train_long_memory()
 
             if score > record:
                 record = score
@@ -54,4 +44,4 @@ def train():
 
 
 if __name__ == '__main__':
-    train()
+    play()
