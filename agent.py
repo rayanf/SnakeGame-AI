@@ -55,8 +55,8 @@ class Agent:
         forward_path,left_path,right_path = game.check_path()
 
         if 1 not in  (forward_path,left_path,right_path):
-            forward_path,left_path,right_path = forward_danger, left_danger, right_danger
-            print('change feature')
+            forward_path,left_path,right_path = (int(not forward_danger), int(not left_danger), int (not right_danger))
+            # print('change feature')
 
         state = [
             # forward_danger,
@@ -97,7 +97,7 @@ class Agent:
         self.trainer.train_step(state, action, reward, next_state, done)
 
     def get_action(self, state, game):
-        self.epsilon = 0 - self.n_games
+        self.epsilon = 200 - self.n_games
         final_move = ['forward' ,'left' ,'right']
         if random.randint(0, 400) < self.epsilon:
             move = random.randint(0, 2)

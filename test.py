@@ -96,10 +96,6 @@ if __name__ == '__main__':
 
 
 
-
-
-
-
     # G=nx.Graph()
     # G.add_edges_from(edges)
     # G_ = G.copy()

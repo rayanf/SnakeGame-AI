@@ -99,8 +99,8 @@ class snake_game:
             # print('thats wrong')
             # print (self.currentfood.rect.center)
             # print('----')
-            if 1 not in lock_list:
-                print(lock_list)    
+            # if 1 not in lock_list:
+            #     print(lock_list)    
                 # print(self.snake.rect.center)
             #     for tail in self.snake.tails:
             #         print(tail.rect.center)
