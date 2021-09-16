@@ -94,14 +94,3 @@ if __name__ == '__main__':
 
     pass
 
-
-
-    # G=nx.Graph()
-    # G.add_edges_from(edges)
-    # G_ = G.copy()
-
-    # G_.remove_nodes_from([1030, 3010, 3030])
-    # del G_
-    # print(nx.has_path(G_,1010,1050))
-
-    # print(G)
